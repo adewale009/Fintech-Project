@@ -1,29 +1,21 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
+import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaService } from '../prisma/prisma.service';
+import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'princey',
-      password: 'ade123',
-      database: 'nestjs',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
-    MongooseModule.forRoot('mongodb://localhost/nest'),
+    MongooseModule.forRoot(process.env.MONGO_URI), // Your MongoDB connection string
+    PrismaModule,
     UsersModule,
     PostsModule,
   ],
-  // controllers: [AppController],
-  // providers: [AppService],
+  providers: [PrismaService],
 })
 export class AppModule {}
