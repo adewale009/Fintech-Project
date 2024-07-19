@@ -1,12 +1,15 @@
-/* eslint-disable prettier/prettier */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service';
-
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const prismaService = app.get(PrismaService); // eslint-disable-line @typescript-eslint/no-unused-vars
+  process.on('beforeExit', async () => {
+    await app.close();
+  });
 
   const config = new DocumentBuilder()
     .setTitle('NestJS Project')
@@ -15,9 +18,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
-    const prismaService: any = app.get(PrismaService);
-    await prismaService.enableShutdownHooks(app);
 
   await app.listen(3000);
 }
